@@ -1,0 +1,15 @@
+import { Body, Controller, Post } from '@nestjs/common';
+import { NotificationsService } from './notifications.service';
+import { NotficationsDto } from './notifications.dto';
+
+@Controller()
+export class NotificationsController {
+  constructor(private readonly notificationsService: NotificationsService) {}
+
+  @Post('notification')
+  async createNotification(
+    @Body() notificationsDto: NotficationsDto,
+  ): Promise<void> {
+    await this.notificationsService.sendNotification(notificationsDto);
+  }
+}
