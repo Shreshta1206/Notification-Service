@@ -16,10 +16,7 @@ export class EmailService {
         { id: data.notificationId },
         { payload: true, email: true },
       );
-      const payload = notification[0]?.payload as {
-        subject: string;
-        body: string;
-      };
+      const payload = notification[0]?.payload as {subject: string, body:string};
       const email = notification[0]?.email;
       console.log(payload);
       console.log(email);
@@ -30,7 +27,7 @@ export class EmailService {
         subject: payload.subject,
         html: payload.body,
       };
-      console.log('message ', message);
+      console.log("message ",message);
       const emailSend = await this.mailerService.sendMail({
         ...message,
       });
