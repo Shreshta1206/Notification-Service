@@ -12,13 +12,17 @@ export class NotificationsService {
     const userId: number = notificationsDto.user_id;
     const email: string = notificationsDto.email;
 
-    await this.notificationsRepository.createNotification({
-      request_id: notificationsDto.request_id,
-      user_id: userId,
-      email: email,
-      channels: notificationsDto.channels,
-      payload: notificationsDto.payload,
-      status: 'PENDING',
-    });
+    const notificaitonRes =
+      await this.notificationsRepository.createNotification({
+        request_id: notificationsDto.request_id,
+        user_id: userId,
+        email: email,
+        channels: notificationsDto.channels,
+        payload: notificationsDto.payload,
+        status: 'PENDING',
+      });
+
+    console.log(notificaitonRes);
+    return notificaitonRes;
   }
 }
