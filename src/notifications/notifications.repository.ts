@@ -10,8 +10,22 @@ export class NotificationsRepository {
     private readonly notificationsRepository: Repository<NotificationsEntity>,
   ) {}
 
-  async createNotification(data: any) {
+  async createNotification(data: Record<string, any>) {
     const notification = this.notificationsRepository.create(data);
-    await this.notificationsRepository.save(notification);
+    return await this.notificationsRepository.save(notification);
+  }
+
+  async findNotification(
+    whereCondition: Record<string, any>,
+    selectCondition: Record<string, any>,
+  ) {
+    const result = await this.notificationsRepository.find({
+      where: whereCondition,
+      select: selectCondition,
+    });
+    
+    console.log(JSON.stringify(result, null, 2));
+    console.log(" result",result);
+    return result;
   }
 }

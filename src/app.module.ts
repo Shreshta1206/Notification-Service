@@ -5,6 +5,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { NotificationsModule } from './notifications/notifications.module';
 import { NotificationsEntity } from './notifications/notifications.entity';
+import { EmailModule } from './email/email.module';
 
 @Module({
   imports: [
@@ -23,9 +24,11 @@ import { NotificationsEntity } from './notifications/notifications.entity';
         database: configService.get<string>('DB_DATABASE'),
         entities: [NotificationsEntity],
         synchronize: true,
+        // logging: true,
       }),
     }),
     NotificationsModule,
+    EmailModule,
   ],
   controllers: [AppController],
   providers: [AppService],
