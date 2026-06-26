@@ -23,9 +23,11 @@ export class NotificationsRepository {
       where: whereCondition,
       select: selectCondition,
     });
-    
-    console.log(JSON.stringify(result, null, 2));
-    console.log(" result",result);
+
     return result;
+  }
+
+  async updateNotification(id, newValues) {
+    return await this.notificationsRepository.update(id, newValues);
   }
 }

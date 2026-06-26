@@ -20,6 +20,8 @@ export class NotificationsController {
     // console.log("notification res ",notification);
     this.rabbitmqService.publish({
       notificationId: notification.id,
+      maxRetryCount: notification.max_retry_count,
+      retryCount: 0,
       channel: 'EMAIL',
     });
   }
