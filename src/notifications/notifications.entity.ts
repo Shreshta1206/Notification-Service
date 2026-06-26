@@ -19,11 +19,17 @@ export class NotificationsEntity {
   @Column()
   email: string;
 
+  @Column()
+  max_retry_count: number;
+
+  @Column()
+  retry_count: number;
+
   @Column('json')
   channels: string[];
 
   @Column('json')
-  payload: Record<string, unknown>;
+  payload: any;
 
   @Column('text')
   status: string;
