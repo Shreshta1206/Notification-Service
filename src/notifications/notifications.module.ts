@@ -4,7 +4,7 @@ import { NotificationsService } from './notifications.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { NotificationsEntity } from './notifications.entity';
 import { NotificationsRepository } from './notifications.repository';
-import { RabbitMQService } from 'src/rabbitmq.service';
+import { RabbitMQService } from 'src/queue/rabbitmq.service';
 import { NotificaitonConsumer } from './notifications.consumer';
 import { EmailService } from 'src/email/email.service';
 

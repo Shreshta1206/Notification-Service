@@ -35,5 +35,5 @@ export class NotificationsEntity {
   status: string;
 
   @CreateDateColumn()
-  createdAt: Date;
+  created_at: Date;
 }
