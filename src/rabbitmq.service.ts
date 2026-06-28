@@ -11,14 +11,28 @@ export class RabbitMQService implements OnModuleInit {
 
     this.channel = await this.connection.createChannel();
 
-    await this.channel.assertQueue('notification_queue', {
+    await this.channel.assertExchange('email_notification_dlx', 'direct', {
       durable: true,
+    });
+    await this.channel.assertQueue('email_notification_dlq', {
+      durable: true,
+    });
+    await this.channel.bindQueue(
+      'email_notification_dlq',
+      'email_notification_dlx',
+      'email_notification_failed',
+    );
+    await this.channel.assertQueue('email_notification_queue', {
+      durable: true,
+      deadLetterExchange: 'email_notification_dlx',
+      deadLetterRoutingKey: 'email_notification_failed',
     });
   }
 
   publish(message: Record<string, any>) {
+    console.log('publishing message ', message);
     this.channel.sendToQueue(
-      'notification_queue',
+      'email_notification_queue',
       Buffer.from(JSON.stringify(message)),
       {
         persistent: true,

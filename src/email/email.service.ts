@@ -24,6 +24,7 @@ export class EmailService {
       await this.notificationsRepository.updateNotification(
         data.notificationId,
         {
+          retry_count: data.retryCount,
           status: NotificationStatus.PROCESSING,
         },
       );
@@ -43,10 +44,10 @@ export class EmailService {
       };
       // console.log('this.count ', this.count);
 
-      // if (this.count <= 3) {
-      //   this.count += 1;
-      //   throw new NotFoundException('User with this ID does not exist.');
-      // }
+      if (this.count < 1) {
+        this.count += 1;
+        throw new NotFoundException('User with this ID does not exist.');
+      }
       await this.mailerService.sendMail(message);
       await this.notificationsRepository.updateNotification(
         data.notificationId,
