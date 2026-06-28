@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { NotificationsRepository } from 'src/notifications/notifications.repository';

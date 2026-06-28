@@ -29,9 +29,8 @@ export class RabbitMQService implements OnModuleInit {
     });
   }
 
-  publish(message: Record<string, any>) {
-    console.log('publishing message ', message);
-    this.channel.sendToQueue(
+  publish(message: Record<string, any>): boolean {
+    return this.channel.sendToQueue(
       'email_notification_queue',
       Buffer.from(JSON.stringify(message)),
       {

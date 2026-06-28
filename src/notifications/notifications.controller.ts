@@ -1,28 +1,13 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { NotificationsService } from './notifications.service';
-import { NotficationsDto } from './notifications.dto';
-import { RabbitMQService } from 'src/rabbitmq.service';
+import { NotificationsDto } from './dto/notifications.dto';
 
 @Controller()
 export class NotificationsController {
-  constructor(
-    private readonly notificationsService: NotificationsService,
-    private readonly rabbitmqService: RabbitMQService,
-  ) {}
+  constructor(private readonly notificationsService: NotificationsService) {}
 
   @Post('notification')
-  async createNotification(
-    @Body() notificationsDto: NotficationsDto,
-  ): Promise<void> {
-    const notification =
-      await this.notificationsService.sendNotification(notificationsDto);
-
-    // console.log("notification res ",notification);
-    this.rabbitmqService.publish({
-      notificationId: notification.id,
-      maxRetryCount: notification.max_retry_count,
-      retryCount: 0,
-      channel: 'EMAIL',
-    });
+  async createNotification(@Body() notificationsDto: NotificationsDto) {
+    return await this.notificationsService.sendNotification(notificationsDto);
   }
 }

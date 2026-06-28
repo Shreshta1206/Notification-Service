@@ -57,7 +57,7 @@ export class NotificaitonConsumer implements OnModuleInit {
         );
       } else {
         this.logger.error('can\t email');
-        channel.nack(message,false,false);
+        channel.nack(message, false, false);
       }
     }
   }
