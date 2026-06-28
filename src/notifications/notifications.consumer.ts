@@ -18,9 +18,13 @@ export class NotificaitonConsumer implements OnModuleInit {
   public async onModuleInit() {
     try {
       await this.channelWrapper.addSetup(async (channel: ConfirmChannel) => {
-        await channel.assertQueue('notification_queue', { durable: true });
+        await channel.assertQueue('email_notification_queue', {
+          durable: true,
+          deadLetterExchange: 'email_notification_dlx',
+          deadLetterRoutingKey: 'email_notification_failed',
+        });
         // eslint-disable-next-line @typescript-eslint/no-misused-promises
-        await channel.consume('notification_queue', async (message) => {
+        await channel.consume('email_notification_queue', async (message) => {
           if (message) {
             await this.handleMessage(message, channel);
           }
@@ -45,7 +49,7 @@ export class NotificaitonConsumer implements OnModuleInit {
         channel.ack(message);
 
         await channel.sendToQueue(
-          'notification_queue',
+          'email_notification_queue',
           Buffer.from(JSON.stringify(content)),
           {
             persistent: true,
