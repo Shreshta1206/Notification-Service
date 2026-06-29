@@ -17,10 +17,10 @@ export class EmailService {
   async sendEmail(data: Record<string, any>) {
     try {
       const notification = await this.notificationsRepository.findNotification(
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        { id: data.notificationId },
-        { payload: true, email: true },
+        { id: data.notificationId, status: NotificationStatus.PENDING },
+        { payload: true, email: true, status: true },
       );
+
       await this.notificationsRepository.updateNotification(
         data.notificationId,
         {
@@ -28,7 +28,7 @@ export class EmailService {
           status: NotificationStatus.PROCESSING,
         },
       );
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+
       const payload = notification[0]?.payload;
       const email = notification[0]?.email;
       // console.log(payload);

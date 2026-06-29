@@ -6,17 +6,19 @@ import { NotificationsEntity } from './notifications.entity';
 import { NotificationsRepository } from './notifications.repository';
 import { RabbitMQService } from 'src/queue/rabbitmq.service';
 import { NotificaitonConsumer } from './notifications.consumer';
-import { EmailService } from 'src/email/email.service';
+import { UserPreferencesModule } from 'src/user-preferences/user-prederences.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([NotificationsEntity])],
+  imports: [
+    TypeOrmModule.forFeature([NotificationsEntity]),
+    UserPreferencesModule,
+  ],
   controllers: [NotificationsController],
   providers: [
     NotificationsService,
     NotificationsRepository,
     RabbitMQService,
     NotificaitonConsumer,
-    EmailService,
   ],
   exports: [NotificationsRepository],
 })
