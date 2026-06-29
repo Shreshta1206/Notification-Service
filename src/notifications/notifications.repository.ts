@@ -46,4 +46,15 @@ export class NotificationsRepository {
       throw error;
     }
   }
+
+  async countNotification(whereCondition: Record<string, any>) {
+    try {
+      return await this.notificationsRepository.count({
+        where: whereCondition,
+      });
+    } catch (error) {
+      this.logger.error('Error updateNotification', error);
+      throw error;
+    }
+  }
 }

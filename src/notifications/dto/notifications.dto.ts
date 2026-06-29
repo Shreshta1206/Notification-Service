@@ -21,6 +21,9 @@ export class NotificationsDto {
   @IsPositive()
   user_id: number;
 
+  @IsString()
+  type: string;
+
   @IsInt()
   @Type(() => Number)
   @IsPositive()

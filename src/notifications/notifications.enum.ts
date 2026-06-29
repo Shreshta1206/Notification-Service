@@ -4,3 +4,9 @@ export enum NotificationStatus {
   SENT = 'SENT',
   FAILED = 'FAILED',
 }
+
+export enum NotificationType {
+  TRANSACTIONAL = 'TRANSACTIONAL',
+  PROMOTIONAL = 'PROMOTIONAL',
+  ALERT = 'ALERT',
+}

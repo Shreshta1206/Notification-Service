@@ -6,6 +6,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { NotificationsModule } from './notifications/notifications.module';
 import { NotificationsEntity } from './notifications/notifications.entity';
 import { EmailModule } from './email/email.module';
+import { UserPreferencesEntity } from './user-preferences/user-preferences.entity';
+import { UserPreferencesModule } from './user-preferences/user-prederences.module';
 
 @Module({
   imports: [
@@ -22,13 +24,14 @@ import { EmailModule } from './email/email.module';
         username: configService.get<string>('DB_USERNAME'),
         password: configService.get<string>('DB_PASSWORD'),
         database: configService.get<string>('DB_DATABASE'),
-        entities: [NotificationsEntity],
+        entities: [NotificationsEntity, UserPreferencesEntity],
         synchronize: true,
         // logging: true,
       }),
     }),
     NotificationsModule,
     EmailModule,
+    UserPreferencesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

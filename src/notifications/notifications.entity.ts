@@ -4,6 +4,7 @@ import {
   Column,
   CreateDateColumn,
 } from 'typeorm';
+import { NotificationStatus, NotificationType } from './notifications.enum';
 
 @Entity('notifications')
 export class NotificationsEntity {
@@ -20,6 +21,9 @@ export class NotificationsEntity {
   email: string;
 
   @Column()
+  type: NotificationType;
+
+  @Column()
   max_retry_count: number;
 
   @Column()
@@ -32,7 +36,7 @@ export class NotificationsEntity {
   payload: any;
 
   @Column('text')
-  status: string;
+  status: NotificationStatus;
 
   @CreateDateColumn()
   created_at: Date;
