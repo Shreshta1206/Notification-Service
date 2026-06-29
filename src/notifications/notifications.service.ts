@@ -48,6 +48,7 @@ export class NotificationsService {
           retry_count: notificationsDto.max_retry_count,
           channels: notificationsDto.channels,
           payload: notificationsDto.payload,
+          type: notificationsDto.type,
           status: 'PENDING',
         });
 
