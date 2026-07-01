@@ -10,13 +10,7 @@ export class UserPreferencesService {
 
   createUserPreference(data) {
     try {
-      this.userPreferencesRepository.createUserPreference({
-        userId: data.userId,
-        transactional: data.transactional,
-        promotional: data.promotional,
-        alerts: data.alerts,
-        emailEnabled: data.emailEnabled,
-      });
+      this.userPreferencesRepository.createUserPreference(data);
     } catch (error) {
       this.logger.error('Error createUserPreference', error);
     }

@@ -17,7 +17,7 @@ export class EmailService {
   async sendEmail(data: Record<string, any>) {
     try {
       const notification = await this.notificationsRepository.findNotification(
-        { id: data.notificationId, status: NotificationStatus.PENDING },
+        { id: data.notificationId, status: NotificationStatus.QUEUED },
         { payload: true, email: true, status: true },
       );
 
@@ -34,7 +34,7 @@ export class EmailService {
       // console.log(payload);
       // console.log(email);
 
-      // console.log('notificationPayload', payload);
+      console.log('notificationPayload', payload);
       const message = {
         to: email,
         subject: payload?.subject,
@@ -43,7 +43,7 @@ export class EmailService {
         attachments: payload?.attachments,
       };
       // console.log('this.count ', this.count);
-
+      console.log("message ",message);
       // if (this.count < 1) {
       //   this.count += 1;
       //   throw new NotFoundException('User with this ID does not exist.');
@@ -56,7 +56,7 @@ export class EmailService {
         },
       );
     } catch (error) {
-      // console.log(error);
+      console.log(error);
       await this.notificationsRepository.updateNotification(
         data.notificationId,
         {

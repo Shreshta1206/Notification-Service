@@ -18,5 +18,5 @@ export class UserPreferencesEntity {
   promotionalLimit: number;
 
   @Column()
-  alert: boolean;
+  systemAlert: boolean;
 }

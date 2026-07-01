@@ -12,7 +12,7 @@ export class NotificationsEntity {
   id: number;
 
   @Column()
-  request_id: number;
+  request_id: string;
 
   @Column()
   user_id: number;
@@ -25,6 +25,9 @@ export class NotificationsEntity {
 
   @Column()
   max_retry_count: number;
+
+  @Column()
+  schedule_at: Date;
 
   @Column()
   retry_count: number;
