@@ -1,112 +1,87 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { NotificationsDto } from './dto/notifications.dto';
 import { NotificationsRepository } from './notifications.repository';
-import { RabbitMQService } from 'src/queue/rabbitmq.service';
-import { UserPreferencesService } from 'src/user-preferences/user-preferences.service';
-import { NotificationStatus, NotificationType } from './notifications.enum';
+import { NotificationChannel, NotificationStatus } from './notifications.enum';
+import { NotificationValidatorService } from 'src/notification-validator/notification-validator.service';
+import { NotificationValidationStatus } from 'src/notification-validator/notification-validator.enum';
+import { NotificationSchedulerService } from 'src/notification-scheduler/notification-scheduler.service';
+import { NotificationPublisherService } from 'src/notification-publisher/notification-publisher.service';
 
 @Injectable()
 export class NotificationsService {
   private readonly logger = new Logger(NotificationsService.name);
   constructor(
     private readonly notificationsRepository: NotificationsRepository,
-    private readonly rabbitmqService: RabbitMQService,
-    private readonly userPreferencesService: UserPreferencesService,
+    private readonly notificationValidatorService: NotificationValidatorService,
+    private readonly notificationSchedulerService: NotificationSchedulerService,
+    private readonly notificationPublisherService: NotificationPublisherService,
   ) {}
   async sendNotification(notificationsDto: NotificationsDto) {
     try {
       const userId: number = notificationsDto.user_id;
       const email: string = notificationsDto.email;
-      const requestId: number = notificationsDto.request_id;
-      const type: string = notificationsDto.type;
-      if (!(await this.checkUserPreference(userId, type))) {
-        return {
-          status: 'FAILURE',
-          message: 'User disabled notificaiton.',
-          requestId: requestId,
-        };
-      }
-      const requestIdCheck =
-        await this.notificationsRepository.findNotification(
-          { request_id: requestId },
-          { request_id: true },
+      const validationResult =
+        await this.notificationValidatorService.validateNotification(
+          notificationsDto,
         );
-      if (requestIdCheck.length > 0) {
-        this.logger.error('RequestId already exists.');
-        return {
-          status: 'FAILED',
-          message: 'RequestId already exists',
-          requestId: requestId,
-        };
+      if (validationResult.status == NotificationValidationStatus.FAIL) {
+        return validationResult;
       }
-      const notificationRes =
-        await this.notificationsRepository.createNotification({
-          request_id: notificationsDto.request_id,
-          user_id: userId,
-          email: email,
-          max_retry_count: notificationsDto.max_retry_count,
-          retry_count: notificationsDto.max_retry_count,
-          channels: notificationsDto.channels,
-          payload: notificationsDto.payload,
-          type: notificationsDto.type,
-          status: 'PENDING',
-        });
 
-      const publishRes = this.rabbitmqService.publish({
-        notificationId: notificationRes.id,
-        maxRetryCount: notificationRes.max_retry_count,
-        retryCount: 0,
-        channel: 'EMAIL',
-      });
+      const currentTime: Date = new Date();
 
-      if (!publishRes) {
-        this.logger.error('Faillure in publishing notification');
-        return {
-          status: 'FAILURE',
-          message: 'Try after sometime.',
-          requestId: requestId,
+      const scheduledTime = new Date(notificationsDto.schedule_at);
+      let result;
+      if (scheduledTime > currentTime) {
+        result =
+          await this.notificationSchedulerService.scheduleNotification(
+            notificationsDto,
+          );
+      } else {
+        const notificationRes =
+          await this.notificationsRepository.createNotification({
+            request_id: notificationsDto.request_id,
+            user_id: userId,
+            email: email,
+            max_retry_count: notificationsDto.max_retry_count,
+            retry_count: notificationsDto.max_retry_count,
+            channels: notificationsDto.channels,
+            payload: notificationsDto.payload,
+            type: notificationsDto.type,
+            schedule_at: notificationsDto.schedule_at,
+            status: NotificationStatus.PENDING,
+          });
+        const message = {
+          notificationId: notificationRes.id,
+          maxRetryCount: notificationRes.max_retry_count,
+          retryCount: 0,
+          channel: NotificationChannel.EMAIL,
         };
+        result = this.notificationPublisherService.publishNotification(message);
+        if (result.status === NotificationStatus.QUEUED) {
+          await this.notificationsRepository.updateNotification(
+            notificationRes.id,
+            {
+              status: NotificationStatus.QUEUED,
+            },
+          );
+        } else {
+          await this.notificationsRepository.updateNotification(
+            notificationRes.id,
+            {
+              status: NotificationStatus.FAILED,
+            },
+          );
+          throw new Error('Failed to Queue');
+        }
       }
-      this.logger.log('Published message successfully');
-      return {
-        status: 'PROCESSING',
-        message: 'Notification queued',
-        requestId: requestId,
-      };
+      return result;
     } catch (error) {
-      this.logger.error('Error occured', error);
+      this.logger.error('Error NotificationsService', error);
+      return {
+        status: NotificationStatus.FAILED,
+        message: 'Error occured',
+      };
     }
-  }
-
-  async checkUserPreference(userId: number, type: string): Promise<boolean> {
-    const preferences =
-      await this.userPreferencesService.getUserPreference(userId);
-
-    if (preferences.emailEnabled == false) return false;
-    if (
-      type == NotificationType.TRANSACTIONAL &&
-      preferences.transactional == false
-    )
-      return false;
-
-    if (
-      type == NotificationType.PROMOTIONAL &&
-      preferences.promotional == false
-    )
-      return false;
-
-    if (type == NotificationType.ALERT && preferences.alert == false)
-      return false;
-
-    const promotionalLimit = preferences.promotionalLimit;
-
-    const promotionalSent =
-      await this.notificationsRepository.countNotification({
-        status: NotificationStatus.SENT,
-        type: NotificationType.PROMOTIONAL,
-      });
-
-    if (promotionalSent == promotionalLimit) return false;
-    return true;
   }
 }

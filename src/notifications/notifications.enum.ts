@@ -1,12 +1,18 @@
 export enum NotificationStatus {
   PENDING = 'PENDING',
+  QUEUED = 'QUEUED',
   PROCESSING = 'PROCESSING',
   SENT = 'SENT',
   FAILED = 'FAILED',
+  SCHEDULED = 'SCHEDULED',
 }
 
 export enum NotificationType {
-  TRANSACTIONAL = 'TRANSACTIONAL',
-  PROMOTIONAL = 'PROMOTIONAL',
-  ALERT = 'ALERT',
+  TRANSACTIONAL = 'transactional',
+  PROMOTIONAL = 'promotional',
+  SYSTEM_ALERT = 'system_alert',
+}
+
+export enum NotificationChannel {
+  EMAIL = 'EMAIL',
 }

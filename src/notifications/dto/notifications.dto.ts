@@ -11,10 +11,8 @@ import {
 import { EmailPayloadDto } from './email-payload.dto';
 
 export class NotificationsDto {
-  @IsInt()
-  @Type(() => Number)
-  @IsPositive()
-  request_id: number;
+  @IsString()
+  request_id: string;
 
   @IsInt()
   @Type(() => Number)
@@ -28,6 +26,9 @@ export class NotificationsDto {
   @Type(() => Number)
   @IsPositive()
   max_retry_count: number;
+
+  @IsString()
+  schedule_at: string;
 
   @IsEmail()
   email: string;
